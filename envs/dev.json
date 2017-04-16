@@ -1,0 +1,6 @@
+{
+  "server": {
+    "basename": "/dev",
+    "url": "https://jsonplaceholder.typicode.com"
+  }
+}

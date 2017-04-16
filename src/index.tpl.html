@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Management Web</title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta name="ci:build" content='build-hash:<%= htmlWebpackPlugin.options.COMMIT_HASH%>'>
+  <% if (htmlWebpackPlugin.files.favicon) { %>
+  <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
+  <% } %>
+
+  <% for (var css in htmlWebpackPlugin.files.css) { %>
+  <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+  <% } %>
+</head>
+<body>
+<!-- App container -->
+<div id="app">__FICO_COMPONENT__</div>
+
+<script >'__FICO_SCRIPT__'</script>
+<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+<% } %>
+
+</body>
+</html>
