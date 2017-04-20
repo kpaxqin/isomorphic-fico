@@ -41,7 +41,7 @@ export function initRouter(routes, { basename, history, rootRenderer }) {
       ? new Promise(routeModule)
       : Promise.resolve(routeModule);
 
-    routeLoader.then((route) => {
+    return routeLoader.then((route) => {
       const { render, providers = [] } = route.default || route;
       return asyncQue(providers)(initProps, initProps)
         .then(finalProps => rootRenderer(render(finalProps), finalProps, { params, props }));
@@ -56,7 +56,9 @@ export function initRouter(routes, { basename, history, rootRenderer }) {
     enrouteConfig[addBasename(i, basename)] = routeRenderer(routes[i]);
   }
 
-  return enroute(enrouteConfig);
+  const result = enroute(enrouteConfig);
+
+  return result ? result : Promise.reject(new Error('No matched route founded'))
 }
 
 function addBasename(path, basename) {
