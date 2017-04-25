@@ -6,8 +6,43 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const config = require('./nodeConfig');
 
-const rootPath = path.resolve(__dirname, '../');
+const rootPath = process.cwd();
 const srcPath = path.resolve(rootPath, 'src');
+
+let _prevAssets = null;
+
+function MyMiddleware (compiler) {
+
+}
+
+MyMiddleware.prototype.apply = function(compiler) {
+  compiler.plugin('after-emit', (compilation, callback) => {
+    const { assets } = compilation
+
+    console.log('**********after-emit************');
+    console.log(compilation.fileTimestamps)
+
+    if (_prevAssets) {
+      for (const f of Object.keys(assets)) {
+        deleteCache(assets[f].existsAt)
+      }
+      for (const f of Object.keys(_prevAssets)) {
+        if (!assets[f]) {
+          deleteCache(_prevAssets[f].existsAt)
+        }
+      }
+    }
+
+    _prevAssets = assets;
+
+    callback()
+  })
+}
+
+function deleteCache(path) {
+  console.log(`******** Delete cache on : ${path}`)
+  delete require.cache[path]
+}
 
 module.exports = {
   context: srcPath,
@@ -65,6 +100,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.jsx', '.js'],
+    modules: [path.resolve(rootPath, "node_modules")]
   },
   plugins: [
     new ExtractTextPlugin({filename: '[name].[hash].css', allChunks: true}),
@@ -72,12 +108,12 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.config': JSON.stringify(config)
     }),
-    new HtmlWebpackPlugin({
-      filename: 'index.tpl.html',
-      template: './index.tpl.html',
-      inject: false,
-      // COMMIT_HASH: gitInfo.long()
-    }),
+    // new HtmlWebpackPlugin({
+    //   filename: 'index.tpl.html',
+    //   template: './index.tpl.html',
+    //   inject: false,
+    //   // COMMIT_HASH: gitInfo.long()
+    // }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',
       minChunks: Infinity,

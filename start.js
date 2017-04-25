@@ -1,20 +1,24 @@
-require('babel-register')
+// require('babel-register')
 require('babel-polyfill')
-require('ignore-styles');
+// require('ignore-styles');
 
-const webpack = require('webpack');
-const webpackConfig = require('./webpack/webpack.dev.config');
+global._fico = {
+  rootPath: process.cwd()
+};
 
-const runServer = require('./src/server').default;
+// const runServer = require('./src/server').default;
 
-const compiler = webpack(webpackConfig);
 
-compiler.run(function (error, stats) {
-  if (error) {
-    console.log('error: ', error);
-    return;
-  }
-  console.log('************ webpack build success ************');
+//
+const webpack = require('webpack')
+const serverConfig = require('./webpack/webpack.server');
 
-  runServer();
+const compiler = webpack(serverConfig);
+
+let firstTime = true;
+compiler.watch(undefined, () => {
+  firstTime && (function() {
+    require('./_dist/server').default;
+    firstTime = false;
+  })()
 });

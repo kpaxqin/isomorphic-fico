@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import React from 'react';
 import createHistory from 'history/createBrowserHistory';
 
-import {routeConfig as routes} from './routes'
+import routes from './routes'
 
 import { initRouter } from './lib/router';
 

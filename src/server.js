@@ -5,7 +5,11 @@ import createHistory from 'history/createMemoryHistory';
 
 import express from 'express';
 
-import {routeConfig as routes} from './routes'
+import webpack from 'webpack';
+import webpackConfig from '../webpack/webpack.dev.config'
+import webpackDevMiddleWare from 'webpack-dev-middleware';
+
+import Layout from './layout';
 
 import { initRouter } from './lib/router';
 
@@ -15,20 +19,13 @@ const history = createHistory({
   basename,
 });
 
-const indexHtml = fs.readFileSync('./_dist/index.tpl.html', 'utf-8');
+let routes = require('./routes').default;
 
 function rootRenderer(pageComponent, finalProps) {
-  const componentHtml = ReactDOMServer.renderToString(pageComponent);
-  const scriptStr = `
-        window.__FICO_STATE__ = {
-          data: ${JSON.stringify(finalProps.data)}
-        }
-      `;
-  const html = indexHtml
-    .replace(/__FICO_COMPONENT__/g, componentHtml)
-    .replace(/'__FICO_SCRIPT__'/g, scriptStr);
-
-  return html
+  return {
+    content: pageComponent,
+    state: finalProps
+  };
 }
 
 const router = initRouter(routes, {
@@ -40,15 +37,31 @@ const router = initRouter(routes, {
 function runServer() {
   const server = express();
 
-  server.use(express.static('_dist'));
+  const compiler = webpack(webpackConfig);
+
+  server.use(webpackDevMiddleWare(compiler, {
+    publicPath: '/',
+    quite: true,
+    serverSideRender: true
+  }));
 
   server.get('*', function (req, res) {
     try {
       console.log('url: ', req.url);
 
-      router(req.url).then((html) => res.end(html));
+      router(req.url).then((pageObj) => {
+        const props = {
+          title: 'Test',
+          initialState: pageObj.state,
+          content: ReactDOMServer.renderToString(pageObj.content),
+          assets: res.locals.webpackStats.toJson().assetsByChunkName
+        };
+        const html = ReactDOMServer.renderToString(
+          <Layout {...props}/>
+        );
+        res.end(html);
+      }).catch((e) => {console.log('error', e)});
     } catch(error) {
-      console.log('error')
       res.end(error.stack)
     }
   });
@@ -59,5 +72,16 @@ function runServer() {
     console.log(`server started at localhost:${port}${basename}`)
   })
 }
+
+if (module.hot) {
+  // Enable Webpack hot module replacement for reducers
+  module.hot.accept('./routes', () => {
+    // eslint-disable-next-line global-require
+    routes = require('./routes').default;
+
+  });
+}
+
+runServer();
 
 export default runServer;

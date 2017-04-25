@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const baseConfig = require('./webpack.config.js');
 
 module.exports = Object.assign({}, baseConfig, {
+  watch: true,
   devtool: 'cheap-module-source-map',
   // entry: mergeEntry(),
   // plugins: [new webpack.HotModuleReplacementPlugin()].concat(baseConfig.plugins)
