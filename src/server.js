@@ -1,4 +1,4 @@
-import fs from 'fs';
+import 'babel-polyfill'
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import createHistory from 'history/createMemoryHistory';
@@ -28,7 +28,7 @@ function rootRenderer(pageComponent, finalProps) {
   };
 }
 
-const router = initRouter(routes, {
+let router = initRouter(routes, {
   rootRenderer,
   history,
   basename,
@@ -78,7 +78,11 @@ if (module.hot) {
   module.hot.accept('./routes', () => {
     // eslint-disable-next-line global-require
     routes = require('./routes').default;
-
+    router = initRouter(routes, {
+      rootRenderer,
+      history,
+      basename,
+    });
   });
 }
 
