@@ -26,7 +26,7 @@ module.exports = {
       'redux-logger',
       'redux-thunk',
     ],
-    app: ['./index.jsx']
+    app: ['./client.jsx']
   },
   output: {
     path: path.resolve(rootPath, '_dist'),
