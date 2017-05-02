@@ -11,7 +11,8 @@
   },
   "scripts": {
     "prestart": "npm run clean",
-    "start": "node ./bin/startDev",
+    "start": "node ./fico/bin/startDev",
+    "build:client": "wepack --config webpack/webpack.config.js",
     "clean": "rimraf ./_dist"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "redux-action-tools": "1.2.0",
     "redux-logger": "2.8.1",
     "redux-thunk": "2.2.0",
+    "universal-router": "^3.1.0",
     "whatwg-fetch": "2.0.2"
   },
   "devDependencies": {

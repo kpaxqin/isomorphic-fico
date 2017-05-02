@@ -8,30 +8,42 @@ function async(value) {
   })
 }
 
-export const routeConfig = {
-  '/(home)?': homePage,
-  '/test/:id': {
-    providers: [props=>{
-      return async(props.router.params.id).then((id) => {
-        return {...props, user: id};
-      })
-    }],
-    render(props) {
-      return <div>Hello: {props.user} !</div>;
-    },
-  },
-  '/test': require("./home/pages/Test"),
-  '/redirect': {
-    render(props) {
-      //redirect can be performed either in render function or provider function.
-      props.router.history.replace('/test');
-    }
-  },
-  '*': {
-    render() {
-      return <div>404 not found</div>;
-    },
-  },
-};
+const routes = {
+  path: '/',
 
-export default routeConfig;
+  children: [
+    {
+      path: '/',
+      module({params}) {
+        return <div>Test is </div>
+      },
+    },
+    {
+      path: '/test/:id',
+      module({params}) {
+        return <div>Id is {params.id}</div>
+      },
+    }
+  ]
+}
+//
+// export const routeConfig = {
+//   '/(home)?': homePage,
+//   '/test/:id': {
+//     fetchData: props=>{
+//       return async(props.router.params.id).then((id) => {
+//         return {...props, user: id};
+//       })
+//     },
+//     render(props) {
+//       return <div>Hello: {props.user} !</div>;
+//     },
+//   },
+//   '*': {
+//     render() {
+//       return <div>404 not found</div>;
+//     },
+//   },
+// };
+
+export default routes;

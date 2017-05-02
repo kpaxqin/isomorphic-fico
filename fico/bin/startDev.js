@@ -6,7 +6,7 @@ const {spawn} = require('child_process');
 const webpack = require('webpack')
 
 function invoke() {
-  const serverConfig = require('../webpack/webpack.server'); //TODO: configurable
+  const serverConfig = require('../../webpack/webpack.server'); //TODO: configurable
 
   const outputPath = serverConfig.output.path;
 
@@ -59,4 +59,4 @@ function invoke() {
 
 invoke();
 
-export default invoke;
+module.exports = invoke;

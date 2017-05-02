@@ -5,7 +5,7 @@ import createHistory from 'history/createBrowserHistory';
 
 import routes from './routes'
 
-import { initRouter } from './lib/router';
+import Router, { initRouter } from './lib/router';
 
 const basename = '';
 
@@ -13,26 +13,19 @@ const history = createHistory({
   basename,
 });
 
-function rootRenderer(pageComponent) {
-  render(pageComponent, document.getElementById('app'));
-}
-
-const router = initRouter(routes, {
-  rootRenderer,
+const router = Router(routes, {
   history,
   basename,
 });
 
-router(window.location.pathname, basename);
+function rootRenderer({component}) {
+  console.log('client is rendering', component)
+  render(component, document.getElementById('app'));
+}
+
+router.resolve({path: window.location.pathname}).then(rootRenderer);
 
 history.listen((location, action) => {
-  router(addBasename(location.pathname, basename), { action });
+  router.resolve({path: location.pathname}).then(rootRenderer);
 });
 
-function addBasename(path, basename) {
-  return cleanPath(`${basename}/${path}`);
-}
-
-function cleanPath(path) {
-  return path.replace(/(\/)+/g, '/');
-}

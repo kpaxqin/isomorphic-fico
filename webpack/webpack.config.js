@@ -9,41 +9,6 @@ const config = require('./nodeConfig');
 const rootPath = process.cwd();
 const srcPath = path.resolve(rootPath, 'src');
 
-let _prevAssets = null;
-
-function MyMiddleware (compiler) {
-
-}
-
-MyMiddleware.prototype.apply = function(compiler) {
-  compiler.plugin('after-emit', (compilation, callback) => {
-    const { assets } = compilation
-
-    console.log('**********after-emit************');
-    console.log(compilation.fileTimestamps)
-
-    if (_prevAssets) {
-      for (const f of Object.keys(assets)) {
-        deleteCache(assets[f].existsAt)
-      }
-      for (const f of Object.keys(_prevAssets)) {
-        if (!assets[f]) {
-          deleteCache(_prevAssets[f].existsAt)
-        }
-      }
-    }
-
-    _prevAssets = assets;
-
-    callback()
-  })
-}
-
-function deleteCache(path) {
-  console.log(`******** Delete cache on : ${path}`)
-  delete require.cache[path]
-}
-
 module.exports = {
   context: srcPath,
   entry: {

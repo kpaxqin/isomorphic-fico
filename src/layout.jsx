@@ -1,18 +1,20 @@
 import React from 'react';
 import _ from 'lodash';
 
+function cleanPath(path) {
+  return path.replace(/(\/)+/g, '/');
+}
 
-
-function renderJs(assets) {
+function renderJs(assets, publicPath) {
   return _.flatten(assets).map(function (path) {
-    return path.endsWith('.js') && <script key={path} src={path} />;
+    return path.endsWith('.js') && <script key={path} src={cleanPath(`${publicPath}/${path}`)} />;
   })
 }
 
-function renderCss(assets) {
+function renderCss(assets, publicPath) {
   return _.flatten(assets).map(function (path) {
     return path.endsWith('.css') && (
-        <link key={path} href={path} rel="stylesheet" />
+        <link key={path} href={cleanPath(`${publicPath}/${path}`)} rel="stylesheet" />
     );
   })
 }
@@ -36,11 +38,10 @@ const Layout = props=> {
         <title>{props.title}</title>
         <meta name='description' content={props.description} />
         <meta name='keywords' content={props.keywords} />
-        {renderCss(props.assets.app)}
+        {renderCss(props.assets.app, props.publicPath)}
       </head>
       <body>
-      <div id='app' dangerouslySetInnerHTML={{ __html: props.content }} />
-      <div id='modal' />
+      <div id='app' dangerouslySetInnerHTML={{ __html: props.children }} />
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -51,7 +52,7 @@ const Layout = props=> {
         }}
       />
       {
-        renderJs([props.assets.commons, props.assets.vendor, props.assets.app])
+        renderJs([props.assets.commons, props.assets.vendor, props.assets.app], props.publicPath)
       }
       </body>
     </html>

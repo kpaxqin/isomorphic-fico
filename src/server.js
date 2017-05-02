@@ -1,6 +1,7 @@
 import 'babel-polyfill'
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import {mapValues} from 'lodash';
 import createHistory from 'history/createMemoryHistory';
 
 import express from 'express';
@@ -11,7 +12,7 @@ import webpackDevMiddleWare from 'webpack-dev-middleware';
 
 import Layout from './layout';
 
-import { initRouter } from './lib/router';
+import Router, { initRouter } from './lib/router';
 
 const basename = '';// || _.get(process.env.config, 'server.basename');
 
@@ -21,15 +22,7 @@ const history = createHistory({
 
 let routes = require('./routes').default;
 
-function rootRenderer(pageComponent, finalProps) {
-  return {
-    content: pageComponent,
-    state: finalProps
-  };
-}
-
-let router = initRouter(routes, {
-  rootRenderer,
+let router = Router(routes, {
   history,
   basename,
 });
@@ -39,8 +32,10 @@ function runServer() {
 
   const compiler = webpack(webpackConfig);
 
+  const publicPath = webpackConfig.output.publicPath;
+
   server.use(webpackDevMiddleWare(compiler, {
-    publicPath: '/',
+    publicPath,
     quite: true,
     serverSideRender: true
   }));
@@ -49,14 +44,19 @@ function runServer() {
     try {
       console.log('url: ', req.url);
 
-      router(req.url).then((pageObj) => {
+      const assets = res.locals.webpackStats.toJson();
+
+      console.log(assets.assetsByChunkName)
+
+      router.resolve({path: req.url}).then(({component, context}) => {
         const props = {
           title: 'Test',
-          initialState: pageObj.state,
-          content: ReactDOMServer.renderToString(pageObj.content),
-          assets: res.locals.webpackStats.toJson().assetsByChunkName
+          initialState: null,
+          children: ReactDOMServer.renderToString(component),
+          publicPath,
+          assets: assets.assetsByChunkName, //TODO read from static json in production
         };
-        const html = ReactDOMServer.renderToString(
+        const html = ReactDOMServer.renderToStaticMarkup(
           <Layout {...props}/>
         );
         res.end(html);
