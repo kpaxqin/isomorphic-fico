@@ -18,8 +18,8 @@ const router = Router(routes, {
   basename,
 });
 
-function rootRenderer({component}) {
-  console.log('client is rendering', component)
+function rootRenderer({component, redirect}) {
+  console.log('client is rendering', component);
   render(component, document.getElementById('app'));
 }
 

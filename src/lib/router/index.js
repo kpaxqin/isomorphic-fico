@@ -4,7 +4,7 @@ import enroute from 'enroute';
 
 import Router from 'universal-router';
 
-const extractModule = module => module.default || module;
+const getModule = module => module.default || module;
 
 const FicoRouter = (routes, {history, basename}) => {
   const options = {
@@ -13,19 +13,17 @@ const FicoRouter = (routes, {history, basename}) => {
     },
     baseUrl: basename,
     async resolveRoute(context, params) {
-      const module = context.route.module;
-      if(!module) return null;
-      let pageModule = module;
+      if (!context.route.module) return null;
 
-      if (typeof module === 'string') {
-        const loadedModule = await require(module);
-        pageModule = extractModule(loadedModule);
-      }
+      const pageModule = getModule(context.route.module);
+
+      const {context: pageContext, component, redirect} = await pageModule(context, params);
 
       return {
-        component: pageModule(context, params),
-        context,
-      };
+        context: pageContext || context,
+        component,
+        redirect,
+      }
     }
   };
   return new Router(routes, options);

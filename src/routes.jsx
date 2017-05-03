@@ -10,18 +10,21 @@ function async(value) {
 
 const routes = {
   path: '/',
-
   children: [
     {
       path: '/',
-      module({params}) {
-        return <div>Test is </div>
+      module: async function(context, params) {
+        return {
+          component: <div>Home</div>,
+        };
       },
     },
     {
       path: '/test/:id',
-      module({params}) {
-        return <div>Id is {params.id}</div>
+      module: async function(context, params) {
+        return {
+          component: <div>Test: {params.id}</div>,
+        };
       },
     }
   ]

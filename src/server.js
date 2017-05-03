@@ -23,6 +23,9 @@ const history = createHistory({
 let routes = require('./routes').default;
 
 let router = Router(routes, {
+  /* pass a factory function and bind with res/req in server side.
+  *  so that we can use history.push/replace as the only way to redirect route in business logic
+  */
   history,
   basename,
 });
@@ -46,9 +49,7 @@ function runServer() {
 
       const assets = res.locals.webpackStats.toJson();
 
-      console.log(assets.assetsByChunkName)
-
-      router.resolve({path: req.url}).then(({component, context}) => {
+      router.resolve({path: req.url}).then(({component, context, redirect}) => {
         const props = {
           title: 'Test',
           initialState: null,
