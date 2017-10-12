@@ -10,6 +10,9 @@ const FicoRouter = (routes, {history, basename}) => {
   const options = {
     context: {
       history,
+      isBrowser: typeof window === "object"
+        && typeof document === 'object'
+        && document.nodeType === 9,
     },
     baseUrl: basename,
     async resolveRoute(context, params) {
@@ -104,7 +107,7 @@ export default FicoRouter;
 //   return path.replace(/(\/)+/g, '/');
 // }
 //
-// export Link from './Link';
+export Link from './Link';
 //
 // export { propTypes, matchRoute };
 

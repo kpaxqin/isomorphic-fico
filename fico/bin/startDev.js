@@ -27,7 +27,7 @@ function invoke() {
   let wasServerMessage;
 
   function startServer () {
-    serverProcess = spawn('node', [outputPath])
+    serverProcess = spawn('node', ['--inspect', outputPath])
     serverProcess.stdout.on('data', data => {
       console.log((wasServerMessage ? '' : '\n') + indentString(chalk.white(data), 4))
       wasServerMessage = true

@@ -49,10 +49,11 @@ function runServer() {
 
       const assets = res.locals.webpackStats.toJson();
 
-      router.resolve({path: req.url}).then(({component, context, redirect}) => {
+      router.resolve({path: req.url, isServer: true}).then(({component, context, redirect}) => {
+        console.log('rendering')
         const props = {
           title: 'Test',
-          initialState: null,
+          initialState: context.initData,
           children: ReactDOMServer.renderToString(component),
           publicPath,
           assets: assets.assetsByChunkName, //TODO read from static json in production
@@ -61,13 +62,20 @@ function runServer() {
           <Layout {...props}/>
         );
         res.end(html);
-      }).catch((e) => {console.log('error', e)});
+      }).catch((e) => {
+        console.log('error', e)
+        if (e.path) {
+          res.redirect(302, e.path);
+        } else {
+          res.end(e.stack || e.message);
+        }
+      });
     } catch(error) {
       res.end(error.stack)
     }
   });
 
-  const port = 3000;
+  const port = 3008;
 
   server.listen(port, () => {
     console.log(`server started at localhost:${port}${basename}`)
@@ -79,8 +87,7 @@ if (module.hot) {
   module.hot.accept('./routes', () => {
     // eslint-disable-next-line global-require
     routes = require('./routes').default;
-    router = initRouter(routes, {
-      rootRenderer,
+    router = Router(routes, {
       history,
       basename,
     });

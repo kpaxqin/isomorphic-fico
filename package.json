@@ -12,7 +12,8 @@
   "scripts": {
     "prestart": "npm run clean",
     "start": "node ./fico/bin/startDev",
-    "build:client": "wepack --config webpack/webpack.config.js",
+    "build:client": "webpack --config webpack/webpack.config.js",
+    "build:server": "NODE_ENV=production webpack --config webpack/webpack.server.js",
     "clean": "rimraf ./_dist"
   },
   "dependencies": {

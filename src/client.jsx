@@ -18,14 +18,28 @@ const router = Router(routes, {
   basename,
 });
 
-function rootRenderer({component, redirect}) {
+// const currentLocation = history.getCurrentLocation();
+
+function rootRenderer({component, context}) {
   console.log('client is rendering', component);
   render(component, document.getElementById('app'));
 }
 
-router.resolve({path: window.location.pathname}).then(rootRenderer);
+function resolve(location) {
+  router.resolve({path: location.pathname, isServer: false})
+    .then(rootRenderer, (e) => {
+      if (e.path) {
+        history.replace(e.path)
+      } else {
+        console.log('client side error', e);
+      }
+    });
+}
+
+resolve(history.location);
 
 history.listen((location, action) => {
-  router.resolve({path: location.pathname}).then(rootRenderer);
+  console.log('resolve in client')
+  resolve(location);
 });
 
