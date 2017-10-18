@@ -14,11 +14,7 @@ import Layout from './layout';
 
 import Router, { initRouter } from './lib/router';
 
-const basename = '';// || _.get(process.env.config, 'server.basename');
-
-const history = createHistory({
-  basename,
-});
+import history from './history'
 
 let routes = require('./routes').default;
 
@@ -27,7 +23,6 @@ let router = Router(routes, {
   *  so that we can use history.push/replace as the only way to redirect route in business logic
   */
   history,
-  basename,
 });
 
 function runServer() {
@@ -78,7 +73,7 @@ function runServer() {
   const port = 3008;
 
   server.listen(port, () => {
-    console.log(`server started at localhost:${port}${basename}`)
+    console.log(`server started at localhost:${port}`)
   })
 }
 
@@ -89,7 +84,6 @@ if (module.hot) {
     routes = require('./routes').default;
     router = Router(routes, {
       history,
-      basename,
     });
   });
 }

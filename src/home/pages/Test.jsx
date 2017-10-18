@@ -68,16 +68,21 @@ function dataProvider(dataLoader) {
 }
 
 export default {
-  providers: [dataProvider(props=> {
+  getInitData: function() {
     return async(getRandomInt()).then(value=> {
       console.log('get init');
       return {count: value};
     })
-  })],
-  render(props) {
-    return <div className="test_kpaxqin" {...props}>root test kpaxqin_is_testing
-      <p><Link to="/page_not_found" history={props.router.history}>404</Link></p>
-      <Counter count={props.data.count}/>
-    </div>;
+  },
+  render({initData}) {
+    return (
+      <div className="test_kpaxqin">
+        root test kpaxqin_is_testing
+        <p>
+          <Link to="/page_not_found">404</Link>
+        </p>
+        <Counter count={initData.count}/>
+      </div>
+    );
   }
 }

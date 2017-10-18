@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
-import HomePage from './home/pages/Home';
 import _ from 'lodash';
+
+import HomePage from './home/pages/Home';
+import TestPage from './home/pages/Test';
+
 function async(value) {
   return new Promise(function (res) {
     console.log('Performing async');
@@ -23,45 +26,16 @@ function getInitData({redirect}) {
   })
 }
 
-const ficoPage = function ({getInitData, render}) {
-
-  return async function(context, params) {
-    const query = {};
-    const initData = context.isBrowser
-      ? window.__FICO_STATE__
-      : await getInitData({params, query});
-
-    const nextContext = {
-      initData,
-      ...context
-    }
-
-    return {
-      context: nextContext,
-      component: render(initData, context)
-    }
-  }
-}
-
 const routes = {
   path: '/',
   children: [
     {
       path: '/',
-      module: ficoPage({
-        getInitData,
-        render(initData, {params}) {
-          return <div>Home, {initData}</div>
-        }
-      }),
+      module: HomePage,
     },
     {
       path: '/test/:id',
-      module: async function(context, params) {
-        return {
-          component: <div>test: {params.id}</div>,
-        };
-      },
+      module: TestPage,
     },
     {
       path: '/links',
@@ -71,6 +45,14 @@ const routes = {
         };
       },
     },
+    {
+      path: '*',
+      module: async function() {
+        return {
+          component: <div>Not found</div>
+        }
+      }
+    }
   ]
 }
 //

@@ -3,22 +3,54 @@ import toRegex from 'path-to-regexp';
 import enroute from 'enroute';
 
 import Router from 'universal-router';
+import isBrowser from '../isBrowser'
 
 const getModule = module => module.default || module;
+
+const isFicoPageConfig = obj => typeof obj === 'object' && obj.render;
+const canUseRehydrateState = ()=> !window.__FICO_STATE_OUTDATED__;
+const getRehydrateState = ()=> {
+  window.__FICO_STATE_OUTDATED__ = true;
+  return window.__FICO_STATE__;
+}
+
+const ficoPage = function ({getInitData, render}) {
+  
+  return async function(context, params) {
+    const query = {};
+    const hasInitDataDependency = !!getInitData;
+
+    const nextContext = {
+      initData: hasInitDataDependency 
+        ? context.isBrowser && canUseRehydrateState()
+          ? getRehydrateState()
+          : await getInitData({params, query})
+        : undefined,
+      ...context
+    }
+
+    return {
+      context: nextContext,
+      component: render(nextContext)
+    }
+  }
+}
 
 const FicoRouter = (routes, {history, basename}) => {
   const options = {
     context: {
       history,
-      isBrowser: typeof window === "object"
-        && typeof document === 'object'
-        && document.nodeType === 9,
+      isBrowser,
     },
-    baseUrl: basename,
+    // baseUrl: basename,
     async resolveRoute(context, params) {
       if (!context.route.module) return null;
 
-      const pageModule = getModule(context.route.module);
+      let pageModule = getModule(context.route.module);
+
+      if (isFicoPageConfig(pageModule)) {
+        pageModule = ficoPage(pageModule);
+      }
 
       const {context: pageContext, component, redirect} = await pageModule(context, params);
 

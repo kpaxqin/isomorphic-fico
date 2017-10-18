@@ -6,7 +6,7 @@ function cleanPath(path) {
 }
 
 function renderJs(assets, publicPath) {
-  return _.flatten(assets).map(function (path) {
+  return _.map(assets, function ([path]) {
     return path.endsWith('.js') && <script key={path} src={cleanPath(`${publicPath}/${path}`)} />;
   })
 }

@@ -1,21 +1,14 @@
 import 'babel-polyfill';
 import { render } from 'react-dom';
 import React from 'react';
-import createHistory from 'history/createBrowserHistory';
+
 
 import routes from './routes'
-
+import history from './history'
 import Router, { initRouter } from './lib/router';
-
-const basename = '';
-
-const history = createHistory({
-  basename,
-});
 
 const router = Router(routes, {
   history,
-  basename,
 });
 
 // const currentLocation = history.getCurrentLocation();

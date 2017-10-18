@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-
+import history from '../../history'
 const isModifiedEvent = (event) =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
 
@@ -8,7 +8,6 @@ const isModifiedEvent = (event) =>
  */
 class Link extends React.Component {
   static propTypes = {
-    history: PropTypes.object,
     onClick: PropTypes.func,
     target: PropTypes.string,
     replace: PropTypes.bool,
@@ -34,7 +33,6 @@ class Link extends React.Component {
     ) {
       event.preventDefault()
 
-      const { history } = this.props
       const { replace, to } = this.props
 
       if (replace) {
@@ -48,7 +46,7 @@ class Link extends React.Component {
   render() {
     const { replace, to, ...props } = this.props // eslint-disable-line no-unused-vars
 
-    const href = this.props.history.createHref(
+    const href = history.createHref(
       typeof to === 'string' ? { pathname: to } : to
     )
 
