@@ -8,11 +8,6 @@ import isBrowser from '../isBrowser'
 const getModule = module => module.default || module;
 
 const isFicoPageConfig = obj => typeof obj === 'object' && obj.render;
-const canUseRehydrateState = ()=> !window.__FICO_STATE_OUTDATED__;
-const getRehydrateState = ()=> {
-  window.__FICO_STATE_OUTDATED__ = true;
-  return window.__FICO_STATE__;
-}
 
 const ficoPage = function ({getInitData, render}) {
   
@@ -22,12 +17,14 @@ const ficoPage = function ({getInitData, render}) {
 
     const nextContext = {
       initData: hasInitDataDependency 
-        ? context.isBrowser && canUseRehydrateState()
-          ? getRehydrateState()
+        ? context.isBrowser && !window.__FICO_STATE_OUTDATED__
+          ? window.__FICO_STATE__
           : await getInitData({params, query})
         : undefined,
       ...context
     }
+
+    context.isBrowser && (window.__FICO_STATE_OUTDATED__ = true);
 
     return {
       context: nextContext,

@@ -3,7 +3,9 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import {mapValues} from 'lodash';
 import createHistory from 'history/createMemoryHistory';
-
+import fs from 'fs';
+import path from 'path';
+import _ from 'lodash'
 import express from 'express';
 
 import webpack from 'webpack';
@@ -32,17 +34,31 @@ function runServer() {
 
   const publicPath = webpackConfig.output.publicPath;
 
-  server.use(webpackDevMiddleWare(compiler, {
-    publicPath,
-    quite: true,
-    serverSideRender: true
-  }));
+  let assets = null;
+
+  console.log(`ENV: ${process.env.NODE_ENV}`)
+
+  if (process.env.NODE_ENV === 'production') {
+    const assetsStr = fs.readFileSync(path.resolve(__dirname, '../assets.json'), {encoding: 'UTF-8'});
+    assets = _.mapValues(JSON.parse(assetsStr), (v)=>Object.values(v))
+
+    server.use(express.static(path.resolve(__dirname, '../')))
+  } else {
+    server.use(webpackDevMiddleWare(compiler, {
+      publicPath,
+      quite: true,
+      serverSideRender: true
+    }));
+  }
+  
 
   server.get('*', function (req, res) {
     try {
       console.log('url: ', req.url);
 
-      const assets = res.locals.webpackStats.toJson();
+      if (process.env.NODE_ENV !== 'production') {
+        assets = res.locals.webpackStats.toJson().assetsByChunkName;
+      }
 
       router.resolve({path: req.url, isServer: true}).then(({component, context, redirect}) => {
         console.log('rendering')
@@ -51,7 +67,7 @@ function runServer() {
           initialState: context.initData,
           children: ReactDOMServer.renderToString(component),
           publicPath,
-          assets: assets.assetsByChunkName, //TODO read from static json in production
+          assets: assets, //TODO read from static json in production
         };
         const html = ReactDOMServer.renderToStaticMarkup(
           <Layout {...props}/>
