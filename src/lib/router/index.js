@@ -5,7 +5,12 @@ import enroute from 'enroute';
 import Router from 'universal-router';
 import isBrowser from '../isBrowser'
 
-const getModule = module => module.default || module;
+const getModule = async module => {
+  if (typeof module === 'function') {
+    module = await module();
+  } 
+  return module.default || module;
+};
 
 const isFicoPageConfig = obj => typeof obj === 'object' && obj.render;
 
@@ -43,7 +48,7 @@ const FicoRouter = (routes, {history, basename}) => {
     async resolveRoute(context, params) {
       if (!context.route.module) return null;
 
-      let pageModule = getModule(context.route.module);
+      let pageModule = await getModule(context.route.module);
 
       if (isFicoPageConfig(pageModule)) {
         pageModule = ficoPage(pageModule);

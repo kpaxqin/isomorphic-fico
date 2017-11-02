@@ -59,6 +59,9 @@ function runServer() {
       if (process.env.NODE_ENV !== 'production') {
         assets = res.locals.webpackStats.toJson().assetsByChunkName;
       }
+      if (req.url.indexOf('.') !== -1) {
+        return;
+      }
 
       router.resolve({path: req.url, isServer: true}).then(({component, context, redirect}) => {
         console.log('rendering')

@@ -30,8 +30,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(rootPath, '_dist'),
-    filename: 'scripts/[name].[hash].js',
-    publicPath: '/',
+    filename: '[name].[hash].js',
+    publicPath: '/scripts/',
     chunkFilename: '[name].[hash].js'
   },
   module: {
@@ -73,16 +73,10 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.config': JSON.stringify(config)
     }),
-    // new HtmlWebpackPlugin({
-    //   filename: 'index.tpl.html',
-    //   template: './index.tpl.html',
-    //   inject: false,
-    //   // COMMIT_HASH: gitInfo.long()
-    // }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
+      name: 'vendor',
       minChunks: Infinity,
-      filename: 'scripts/[name].[hash].js'
+      filename: '[name].[hash].js'
     }),
   ]
 };

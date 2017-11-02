@@ -20,7 +20,7 @@ fs.readdirSync('node_modules')
 module.exports = {
   context: srcPath,
   watch: !(process.env.NODE_ENV === 'production'),
-  // devtool: 'eval',
+  devtool: !(process.env.NODE_ENV === 'production') ? 'eval' : undefined,
   entry: [
     'webpack/hot/poll?1000',
     './server'

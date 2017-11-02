@@ -52,7 +52,7 @@ const Layout = props=> {
         }}
       />
       {
-        renderJs([props.assets.commons, props.assets.vendor, props.assets.app], props.publicPath)
+        renderJs([props.assets.vendor, props.assets.app], props.publicPath)
       }
       </body>
     </html>

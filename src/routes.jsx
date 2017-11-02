@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
 
-import HomePage from './home/pages/Home';
 import TestPage from './home/pages/Test';
 
 function async(value) {
@@ -31,7 +30,9 @@ const routes = {
   children: [
     {
       path: '/',
-      module: HomePage,
+      module: async ()=> {
+        return import(/*  webpackChunkName: "home"  */ './home/pages/Home')
+      },
     },
     {
       path: '/test/:id',
