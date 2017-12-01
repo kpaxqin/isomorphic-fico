@@ -77,3 +77,47 @@ const routes = {
 // };
 
 export default routes;
+
+function createUI({
+  updates = {
+    INIT(props) { // no async here
+      return props.init || 3;
+    },
+    add(props, state) {
+      return state + props;
+    },
+  },
+  handlers = {
+    onInc(e, props) {
+      
+    }
+  },
+  view = function Test({state, handlers}) {
+    return <div>
+      {state}
+      <button onClick={handlers.onInc}>Inc</button>  
+    </div>
+  },
+}) {
+  const name = view.name;
+
+  class UI extends React.Component {
+    constructor(props) {
+      super();
+      this.state = updates.INIT(props);
+      this.updates = Object.keys(updates).reduce((acc, key) => {
+        acc[key] = ()=> {
+          const fn = updates[key];
+          this.setState((state)=> fn(this.props, state));
+        }
+        return acc;
+      }, {})
+    }
+    render() {
+      return view(this.state, this.updates)
+    }
+  }
+  
+
+  return UI;
+}
